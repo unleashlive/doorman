@@ -105,6 +105,7 @@ def greengrass_infinite_infer_run():
         # The sample projects come with optimized artifacts, hence only the artifact
         # path is required.
         model_path = '/opt/awscam/artifacts/mxnet_deploy_ssd_resnet50_300_FP16_FUSED.xml'
+        #model_path = 'opt/awscam/artifacts/mxnet_deploy_ssd_FP16_FUSED.xml'
         # Load the model onto the GPU.
         client.publish(topic=iot_topic, payload='Loading object detection model')
         model = awscam.Model(model_path, {'GPU': 1})
@@ -154,7 +155,7 @@ def greengrass_infinite_infer_run():
 
                         try:
                             # if a person was found, upload the target area to S3 for further inspection
-                            if output_map[obj['label']] == 'person':
+                            #if output_map[obj['label']] == 'person':
 
                                 # get the person image
                                 person = frame[ymin:ymax, xmin:xmax]

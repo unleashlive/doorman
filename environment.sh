@@ -1,0 +1,5 @@
+export BUCKET_NAME=doorman-guidepost
+export REKOGNITION_COLLECTION_ID=doorman-guidepost
+export SLACK_API_TOKEN=xoxp-2151114050-2151114648-477008395767-ebf0bc1ac19b1b1e3bdfc22fb50f215b  
+export SLACK_CHANNEL_ID=guidepost-doorman
+export SLACK_TRAINING_CHANNEL_ID=guidepost-doorman

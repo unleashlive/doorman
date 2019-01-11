@@ -63,7 +63,6 @@ def train(event, context):
             ]
         }
         print(message)
-        requests.post(data['response_url'], headers={'Content-Type':'application/json;charset=UTF-8', 'Authorization': 'Bearer %s' % slack_token}, json=message)
 
         # response is send, start training
         client = boto3.client('rekognition')
@@ -76,7 +75,7 @@ def train(event, context):
                 }
             },
             ExternalImageId=user_id,
-            QualityFilter='AUTO',
+            #QualityFilter='AUTO',
             DetectionAttributes=['DEFAULT']
         )
 
@@ -85,6 +84,7 @@ def train(event, context):
         s3.Object(bucket_name, new_key).copy_from(CopySource='%s/%s' % (bucket_name, key))
         s3.ObjectAcl(bucket_name, new_key).put(ACL='public-read')
         s3.Object(bucket_name, key).delete()
+        requests.post(data['response_url'], headers={'Content-Type':'application/json;charset=UTF-8', 'Authorization': 'Bearer %s' % slack_token}, json=message)
 
     return {
         "statusCode": 200

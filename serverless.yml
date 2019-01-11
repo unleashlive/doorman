@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: doormantest
+service: doorman-chicago
 
 custom:
   pythonRequirements:
@@ -32,6 +32,10 @@ provider:
         - "rekognition:DetectFaces"
         - "rekognition:SearchFacesByImage"
         - "rekognition:IndexFaces"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "sns:Publish"
       Resource: "*"
     - Effect: "Allow"
       Action:
@@ -105,7 +109,13 @@ functions:
   find-person:
     handler: find_person.function_handler
     runtime: python2.7
-    role: arn:aws:iam::546464786011:role/service-role/AWSDeepLensLambdaRole
+    role: arn:aws:iam::336843223770:role/service-role/AWSDeepLensLambdaRole
+
+  speak:
+    handler: speak.function_handler
+    runtime: python2.7
+    role: arn:aws:iam::336843223770:role/service-role/AWSDeepLensLambdaRole
+
 
 # resources:
 #   Resources:

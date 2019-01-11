@@ -1,8 +1,11 @@
+import os, sys
+here = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(here, "vendored"))
+
 import json
 import boto3
 import requests
 import hashlib
-import os
 from urllib.parse import parse_qs
 
 bucket_name = os.environ['BUCKET_NAME']
