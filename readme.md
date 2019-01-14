@@ -7,29 +7,33 @@ This was send in as part of the [AWS Deeplens Hackaton](https://devpost.com/soft
 
 Setup
 -----
-Quite a few steps, needs cleanup, most of it can be automated.
-
+Below you will find the steps to get set up
 - Create a bucket, remember the name, make sure that your deeplens user can write to this bucket.
+  `aws s3 mb doorman-<name>`
 - Create a Rekognition collection (and note the collecition id)
-- Be sure to have the following env vars in your environment:
-  - BUCKET_NAME=your-bucket-name
-  - SLACK_API_TOKEN=your-slack-token
-  - SLACK_CHANNEL_ID="slack-channel-id"
-  - REKOGNITION_COLLECTION_ID="your-collection-id"
-
-- Deploy the lambda functions with Serverles (eg: `sls deploy`), this will create a CF stack with your functions. Note the api gateway endpoint, you'll need it later
-
-- Go into the deeplens console, and create a project, select the "Object detection" model
-- Remove the `deeplens-object-detection` function, and add a function for `find_person`
-- Deploy the application to your deeplens
+  `aws rekognition create-collection --collection-id <name>` 
 
 - Go to the [slack api](https://api.slack.com/apps), and click "create a new app".
 - Give a name, and select your workspace
 - Activate:
   - Incoming webhooks
-  - Interactive components (use the api gateway endpoint that you noted before, ignore `Load URL`)
+  - Interactive components (put in a dummy value for now, ignore `Load URL`)
   - Permissions: Install the app in your workspace, and note the token. You'll need `chat:write:bot`, `channels:read` and `incoming-webhook`.
-- Deploy the app again with the new environment variables
+
+- Be sure to have the following env vars in your environment (you can update them in `environment.sh`, but don't check this file in):
+  - BUCKET_NAME=your-bucket-name
+  - SLACK_API_TOKEN=your-slack-token 
+  - SLACK_CHANNEL_ID="slack-channel-id"
+  - REKOGNITION_COLLECTION_ID="your-collection-id"
+
+- Deploy the lambda functions with Serverles (eg: `sls deploy`), this will create a CF stack with your functions. Note the api gateway endpoint, you'll need it later
+
+- Go back the [slack api](https://api.slack.com/apps), and update your Incoming webhooks to point to https://<your-api-gateway>/dev/faces/train.
+- Deploy the Slack app again
+
+- Go into the deeplens console, and create a project, select the "Object detection" model
+- Remove the `deeplens-object-detection` function, and add a function for `find_person`
+- Deploy the application to your deeplens
 
 That should be it. Whenever the Deeplens rekognizes someone, it will upload into the S3 bucket. Which will trigger the other lambda functions.
 
