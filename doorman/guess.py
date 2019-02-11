@@ -9,10 +9,10 @@ slack_token = os.environ['SLACK_API_TOKEN']
 slack_channel_id = os.environ['SLACK_CHANNEL_ID']
 slack_training_channel_id = os.environ['SLACK_TRAINING_CHANNEL_ID']
 rekognition_collection_id = os.environ['REKOGNITION_COLLECTION_ID']
-truportal_username = os.environ['TRUPORTAL_USERNAME']
-truportal_password = os.environ['TRUPORTAL_PASSWORD']
-door_id = os.environ['DOOR_ID']
-truportal_ip = os.environ['TRUPORTAL_IP']
+# truportal_username = os.environ['TRUPORTAL_USERNAME']
+# truportal_password = os.environ['TRUPORTAL_PASSWORD']
+# door_id = os.environ['DOOR_ID']
+# truportal_ip = os.environ['TRUPORTAL_IP']
 
 def guess(event, context):
     client = boto3.client('rekognition')
@@ -119,33 +119,33 @@ def guess(event, context):
 
         resp = requests.post("https://slack.com/api/chat.postMessage", headers={'Content-Type':'application/json;charset=UTF-8', 'Authorization': 'Bearer %s' % slack_token}, json=data)
 
-        data = {
-            "username": truportal_username,
-            "password": truportal_password
-        }
+        # data = {
+        #     "username": truportal_username,
+        #     "password": truportal_password
+        # }
 
-        headers = {
-            'Content-Type': 'application/json'
-        }
+        # headers = {
+        #     'Content-Type': 'application/json'
+        # }
 
-        auth_url = "https://%s/api/auth/login" % truportal_ip
+        # auth_url = "https://%s/api/auth/login" % truportal_ip
 
-        print(auth_url)
+        # print(auth_url)
 
-        resp = requests.post(auth_url, verify=False, headers=headers, json=data)
+        # resp = requests.post(auth_url, verify=False, headers=headers, json=data)
 
-        print(resp.json())
+        # print(resp.json())
 
-        session_key = resp.json()['sessionKey']
+        # session_key = resp.json()['sessionKey']
 
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': session_key
-        }
+        # headers = {
+        #     'Content-Type': 'application/json',
+        #     'Authorization': session_key
+        # }
 
-        door_url = "https://%s/api/devices/doors/%s/state?command=grant-access" % (truportal_ip, door_id)
+        # door_url = "https://%s/api/devices/doors/%s/state?command=grant-access" % (truportal_ip, door_id)
 
-        print(door_url)
+        # print(door_url)
 
         #resp = requests.post(door_url, verify=False, headers=headers, json=data)
 

@@ -41,20 +41,19 @@ provider:
        - "s3:DeleteObject"
       Resource:
         - "arn:aws:s3:::${env:BUCKET_NAME}/*"
-
- #   - Effect: "Allow"
- #     Action:
- #       - "s3:ListBucket"
- #     Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
- #   - Effect: "Allow"
- #     Action:
- #       - "s3:PutObject"
- #     Resource:
- #       Fn::Join:
- #         - ""
- #         - - "arn:aws:s3:::"
- #           - "Ref" : "ServerlessDeploymentBucket"
- #           - "/*"
+    - Effect: "Allow"
+      Action:
+        - "s3:ListBucket"
+      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+    - Effect: "Allow"
+      Action:
+        - "s3:PutObject"
+      Resource:
+        Fn::Join:
+          - ""
+          - - "arn:aws:s3:::"
+            - "Ref" : "ServerlessDeploymentBucket"
+            - "/*"
 
 # you can define service wide environment variables here
   environment:
@@ -109,15 +108,14 @@ functions:
   find-person:
     handler: find_person.function_handler
     runtime: python2.7
-    role: arn:aws:iam::546464786011:role/service-role/AWSDeepLensLambdaRole
 
-# resources:
-#   Resources:
-#     S3BucketDoormanfaces:
-#       Type: AWS::S3::Bucket
-#       Properties:
-#         BucketName: ${env:BUCKET_NAME}
-#         # add additional custom bucket configuration here
+resources:
+  Resources:
+    S3BucketDoormandeeplens:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${env:BUCKET_NAME}
+        # add additional custom bucket configuration here
 #
 plugins:
   - serverless-python-requirements
