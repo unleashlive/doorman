@@ -4,6 +4,7 @@
 .env
 node_modules
 env/
+venv/
 build/
 develop-eggs/
 dist/
