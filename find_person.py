@@ -141,7 +141,7 @@ def greengrass_infinite_infer_run():
         last_notification_triggered = datetime.utcnow()
 
         last_session_created = datetime.utcnow()
-        session_name = "session-" + str(int(round(last_session_created.timestamp() *1000)))
+        session_name = "session-" + str(int(time.time()*1000))
 
         # Do inference until the lambda is killed.
         while True:
@@ -211,7 +211,7 @@ def greengrass_infinite_infer_run():
                                 filename = "incoming/%s" % s3_key  # the guess lambda function is listening here
                                 if datetime.utcnow() > (last_session_created + timedelta(days=1)):
                                     last_session_created = datetime.utcnow()
-                                    session_name = "session-" + str(int(round(last_session_created.timestamp() * 1000)))
+                                    session_name = "session-" + str(int(time.time() * 1000))
 
                                 user_filename = "{}/{}/{}".format(s3_user_session_prefix, session_name, s3_key)
                                 response = s3.put_object(ACL='public-read', Body=jpg_data.tostring(),Bucket=s3_bucket,Key=filename)
