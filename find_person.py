@@ -205,7 +205,7 @@ def greengrass_infinite_infer_run():
                                 #    client.publish(topic=iot_topic, payload=resp)
 
                                 # create a nice s3 file key
-                                s3_key = datetime.utcnow().strftime('%Y-%m-%d_%H_%M_%S.%f') + '.jpg'
+                                s3_key = datetime.utcnow().strftime('%Y-%m-%d_%H_%M_%S_%f') + '.jpg'
                                 encode_param=[int(cv2.IMWRITE_JPEG_QUALITY), 90]  # 90% should be more than enough
                                 _, jpg_data = cv2.imencode('.jpg', person, encode_param)
                                 filename = "incoming/%s" % s3_key  # the guess lambda function is listening here
