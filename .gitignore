@@ -18,6 +18,8 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+.idea
+environment.sh
 
 # Serverless directories
 .serverless

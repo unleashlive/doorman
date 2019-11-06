@@ -41,6 +41,7 @@ provider:
        - "s3:DeleteObject"
       Resource:
         - "arn:aws:s3:::${env:BUCKET_NAME}/*"
+        - "arn:aws:s3:::${env:USER_BUCKET_NAME}/*"
     - Effect: "Allow"
       Action:
         - "s3:ListBucket"
@@ -55,9 +56,12 @@ provider:
             - "Ref" : "ServerlessDeploymentBucket"
             - "/*"
 
+
 # you can define service wide environment variables here
   environment:
     BUCKET_NAME: ${env:BUCKET_NAME}
+    USER_BUCKET_NAME: ${env:USER_BUCKET_NAME}
+    USER_SESSION_PREFIX: ${env:USER_SESSION_PREFIX}
     SLACK_API_TOKEN: ${env:SLACK_API_TOKEN}
     SLACK_CHANNEL_ID: ${env:SLACK_CHANNEL_ID}
     SLACK_TRAINING_CHANNEL_ID: ${env:SLACK_TRAINING_CHANNEL_ID}

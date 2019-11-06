@@ -12,6 +12,7 @@ import numpy as np
 import awscam
 import cv2
 import greengrasssdk
+import requests
 import time
 import base64
 from datetime import datetime, timedelta
@@ -21,6 +22,9 @@ from botocore.session import Session
 session = Session()
 s3 = session.create_client('s3')
 s3_bucket = os.environ['BUCKET_NAME']
+s3_user_bucket = os.environ['USER_BUCKET_NAME']
+s3_user_session_prefix = os.environ['USER_SESSION_PREFIX']
+ms_teams_webhook = os.environ['MS_TEAMS_WEBHOOK']
 #rekognition_collection_id = os.environ['REKOGNITION_COLLECTION_ID']
 #rekognition = session.create_client('rekognition')
 
@@ -83,6 +87,23 @@ class LocalDisplay(Thread):
     def join(self):
         self.stop_request.set()
 
+
+def trigger_ms_teams_notification(link_to_file):
+    try:
+        requests.post(
+            ms_teams_webhook,
+            headers={
+                'Content-Type': 'application/json;charset=UTF-8',
+            },
+            json={
+                "text": 'Person at the gate ({})'.format(link_to_file)
+            }
+        )
+    except Exception as ex:
+        pass
+
+    pass
+
 def greengrass_infinite_infer_run():
     """ Entry point of the lambda function"""
     try:
@@ -91,7 +112,7 @@ def greengrass_infinite_infer_run():
         # the machine labels to human readable labels.
         model_type = 'ssd'
         output_map = {1: 'aeroplane', 2: 'bicycle', 3: 'bird', 4: 'boat', 5: 'bottle', 6: 'bus',
-                      7 : 'car', 8 : 'cat', 9 : 'chair', 10 : 'cow', 11 : 'dinning table',
+                      7 : 'car', 8 : 'cat', 9 : 'chair', 10 : 'cow', 11 : 'dining table',
                       12 : 'dog', 13 : 'horse', 14 : 'motorbike', 15 : 'person',
                       16 : 'pottedplant', 17 : 'sheep', 18 : 'sofa', 19 : 'train',
                       20 : 'tvmonitor'}
@@ -116,6 +137,11 @@ def greengrass_infinite_infer_run():
         input_width = 300
 
         lastmatch = datetime.utcnow()
+
+        last_notification_triggered = datetime.utcnow()
+
+        last_session_created = datetime.utcnow()
+        session_name = "session-" + str(int(round(last_session_created.timestamp() *1000)))
 
         # Do inference until the lambda is killed.
         while True:
@@ -183,7 +209,18 @@ def greengrass_infinite_infer_run():
                                 encode_param=[int(cv2.IMWRITE_JPEG_QUALITY), 90]  # 90% should be more than enough
                                 _, jpg_data = cv2.imencode('.jpg', person, encode_param)
                                 filename = "incoming/%s" % s3_key  # the guess lambda function is listening here
+                                if datetime.utcnow() > (last_session_created + timedelta(days=1)):
+                                    last_session_created = datetime.utcnow()
+                                    session_name = "session-" + str(int(round(last_session_created.timestamp() * 1000)))
+
+                                user_filename = "{}/{}/{}".format(s3_user_session_prefix, session_name, s3_key)
                                 response = s3.put_object(ACL='public-read', Body=jpg_data.tostring(),Bucket=s3_bucket,Key=filename)
+
+                                response_for_user_save = s3.put_object(Body=jpg_data.tostring(),Bucket=s3_user_bucket,Key=user_filename)
+
+                                if datetime.utcnow() > (last_notification_triggered + timedelta(seconds=10)):
+                                    trigger_ms_teams_notification("https://{}.s3.amazonaws.com/{}".format(s3_user_bucket, user_filename))
+                                    last_notification_triggered = datetime.utcnow()
 
                                 # reset the timer for the next match
                                 lastmatch = datetime.utcnow()

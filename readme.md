@@ -13,11 +13,14 @@ Quite a few steps, needs cleanup, most of it can be automated.
 - Create a Rekognition collection (and note the collecition id)
 - Be sure to have the following env vars in your environment:
   - BUCKET_NAME=your-bucket-name
+  - USER_BUCKET_NAME=your-bucket-name
+  - USER_SESSIONS_PREFIX=your-bucket-name
+  - MS_TEAMS_WEBHOOK=webhook-for-msteams-integration
   - SLACK_API_TOKEN=your-slack-token
   - SLACK_CHANNEL_ID="slack-channel-id"
   - REKOGNITION_COLLECTION_ID="your-collection-id"
 
-- Deploy the lambda functions with Serverles (eg: `sls deploy`), this will create a CF stack with your functions. Note the api gateway endpoint, you'll need it later
+- Deploy the lambda functions with Serverless (eg: `sls deploy`), this will create a CF stack with your functions. Note the api gateway endpoint, you'll need it later
 
 - Go into the deeplens console, and create a project, select the "Object detection" model
 - Remove the `deeplens-object-detection` function, and add a function for `find_person`
