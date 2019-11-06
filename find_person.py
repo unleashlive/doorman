@@ -219,7 +219,7 @@ def greengrass_infinite_infer_run():
                                 response_for_user_save = s3.put_object(Body=jpg_data.tostring(),Bucket=s3_user_bucket,Key=user_filename)
 
                                 if datetime.utcnow() > (last_notification_triggered + timedelta(seconds=10)):
-                                    trigger_ms_teams_notification("https://{}.s3.amazonaws.com/{}".format(s3_user_bucket, user_filename))
+                                    trigger_ms_teams_notification('https://cloud.unleashlive.com/secure/library/GATEKEEPER/{}'.format(session_name))
                                     last_notification_triggered = datetime.utcnow()
 
                                 # reset the timer for the next match
