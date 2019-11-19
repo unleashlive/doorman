@@ -131,7 +131,7 @@ def greengrass_infinite_infer_run():
         model = awscam.Model(model_path, {'GPU': 1})
         client.publish(topic=iot_topic, payload='Object detection model loaded')
         # Set the threshold for detection
-        detection_threshold = 0.8
+        detection_threshold = 0.7
         # The height and width of the training set images
         input_height = 300
         input_width = 300
@@ -189,6 +189,29 @@ def greengrass_infinite_infer_run():
                                 gray = cv2.cvtColor(person, cv2.COLOR_BGR2GRAY)
                                 faces = face_cascade.detectMultiScale(gray, 1.1, 5)
 
+                                # create a nice s3 file key
+                                s3_key = datetime.utcnow().strftime('%Y-%m-%d_%H_%M_%S_%f') + '.jpg'
+                                encode_param=[int(cv2.IMWRITE_JPEG_QUALITY), 90]  # 90% should be more than enough
+                                _, jpg_data = cv2.imencode('.jpg', person, encode_param)
+
+                                if datetime.utcnow() > (last_session_created + timedelta(days=1)):
+                                    last_session_created = datetime.utcnow()
+                                    session_name = "session-" + str(int(time.time() * 1000))
+
+                                user_file_timestamp = str(int(time.time() * 1000))
+                                user_filename = "{}/{}/{}".format(s3_user_session_prefix, session_name, s3_key)
+
+                                metadata = {
+                                    'date_created': user_file_timestamp,
+                                    'lastmodified': user_file_timestamp
+                                }
+
+                                response_for_user_save = s3.put_object(Body=jpg_data.tostring(),Metadata=metadata,Bucket=s3_user_bucket,Key=user_filename)
+
+                                if datetime.utcnow() > (last_notification_triggered + timedelta(seconds=10)):
+                                    trigger_ms_teams_notification('https://cloud.unleashlive.com/secure/library/GATEKEEPER/{}'.format(session_name))
+                                    last_notification_triggered = datetime.utcnow()
+
                                 if len(faces) != 1:
                                     client.publish(topic=iot_topic, payload="Skipping, no faces")
                                     continue
@@ -204,23 +227,8 @@ def greengrass_infinite_infer_run():
                                 #if len(resp['FaceMatches']) > 0:
                                 #    client.publish(topic=iot_topic, payload=resp)
 
-                                # create a nice s3 file key
-                                s3_key = datetime.utcnow().strftime('%Y-%m-%d_%H_%M_%S_%f') + '.jpg'
-                                encode_param=[int(cv2.IMWRITE_JPEG_QUALITY), 90]  # 90% should be more than enough
-                                _, jpg_data = cv2.imencode('.jpg', person, encode_param)
                                 filename = "incoming/%s" % s3_key  # the guess lambda function is listening here
-                                if datetime.utcnow() > (last_session_created + timedelta(days=1)):
-                                    last_session_created = datetime.utcnow()
-                                    session_name = "session-" + str(int(time.time() * 1000))
-
-                                user_filename = "{}/{}/{}".format(s3_user_session_prefix, session_name, s3_key)
                                 response = s3.put_object(ACL='public-read', Body=jpg_data.tostring(),Bucket=s3_bucket,Key=filename)
-
-                                response_for_user_save = s3.put_object(Body=jpg_data.tostring(),Bucket=s3_user_bucket,Key=user_filename)
-
-                                if datetime.utcnow() > (last_notification_triggered + timedelta(seconds=10)):
-                                    trigger_ms_teams_notification('https://cloud.unleashlive.com/secure/library/GATEKEEPER/{}'.format(session_name))
-                                    last_notification_triggered = datetime.utcnow()
 
                                 # reset the timer for the next match
                                 lastmatch = datetime.utcnow()
