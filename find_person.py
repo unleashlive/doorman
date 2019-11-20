@@ -203,10 +203,15 @@ def greengrass_infinite_infer_run():
 
                                 metadata = {
                                     'date_created': user_file_timestamp,
-                                    'lastmodified': user_file_timestamp
+                                    'lastmodified': user_file_timestamp,
+                                    'source': 'deeplens',
+                                    'isai': 'false',
+                                    'modelid': 'mxnet_deploy_ssd_resnet50_300_FP16_FUSED'
                                 }
 
-                                response_for_user_save = s3.put_object(Body=jpg_data.tostring(),Metadata=metadata,Bucket=s3_user_bucket,Key=user_filename)
+                                response_for_user_save = s3.put_object(Body=jpg_data.tostring(), Metadata=metadata,
+                                                                       Bucket=s3_user_bucket, Key=user_filename,
+                                                                       ContentType="image/jpeg")
 
                                 if datetime.utcnow() > (last_notification_triggered + timedelta(seconds=10)):
                                     trigger_ms_teams_notification('https://cloud.unleashlive.com/secure/library/GATEKEEPER/{}'.format(session_name))
